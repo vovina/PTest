@@ -27,6 +27,7 @@ const Img = styled.img`
   max-width: ${props => (props.zoom === 1 ? `256px` : `128px`)};
   max-height: ${props => (props.zoom === 1 ? `256px` : `128px`)};
   margin-bottom: -3px;
+  transform: rotate(180deg);
 `;
 
 const StyledPanZoom = styled(PanZoom)`
@@ -36,25 +37,28 @@ const StyledPanZoom = styled(PanZoom)`
 export const MapView = ({ zoom }) => {
   const [mapZoomState, setMapZoomState] = useState(zoom);
   const [imagesToLoad, setImagesToLoad] = useState(
-    data.filter(imagePath => {
+    data.find((imagePath) => {
       return imagePath.zoom === zoom;
     })
   );
 
   const [imageDetails, setImageDetails] = useState(
-    imagesToLoad.length ? imagesToLoad[0].image : ""
+    imagesToLoad ? imagesToLoad.image : ""
   );
 
   const [dx, setDx] = useState(0);
   const [dy, setDy] = useState(0);
 
   useEffect(() => {
-    let images = data.filter(imagePath => {
+    let imageObj = data.find(imagePath => {
       return imagePath.zoom === mapZoomState;
     });
-    setImagesToLoad(images);
 
-    setImageDetails(images.length ? images[0].image : "");
+    const { image } = imageObj;
+    setImagesToLoad(image);
+
+    setImageDetails(image ? image : "");
+
   }, [mapZoomState, imageDetails]);
 
   const zoomIn = () => {
@@ -91,20 +95,26 @@ export const MapView = ({ zoom }) => {
         enablePan={true}
       >
         {imageDetails
-          ? imageDetails.map((image, index) => (
-              <div key={index}>
-                {image.length
-                  ? image.map((img, i) => (
-                      <Img
-                        zoom={mapZoomState}
-                        src={require(`../${img}`)}
-                        altText={img}
-                        key={Math.random()}
-                      />
-                    ))
-                  : ""}
-              </div>
-            ))
+          ? imageDetails
+              .map((image, index) => {
+                return (
+                  <div key={index}>
+                    {image.length
+                      ? image
+                          .map((img, i) => (
+                            <Img
+                              zoom={mapZoomState}
+                              src={require(`../${img}`)}
+                              altText={img}
+                              key={Math.random()}
+                            />
+                          ))
+                          .reverse()
+                      : ""}
+                  </div>
+                );
+              })
+              .reverse()
           : ""}
       </StyledPanZoom>
     </>
