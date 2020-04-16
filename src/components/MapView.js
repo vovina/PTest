@@ -95,12 +95,12 @@ export const MapView = ({ zoom }) => {
         enablePan={true}
       >
         {imageDetails
-          ? imageDetails
+          ? [...imageDetails].reverse()
               .map((image, index) => {
                 return (
                   <div key={index}>
                     {image.length
-                      ? image
+                      ? [...image].reverse()
                           .map((img, i) => (
                             <Img
                               zoom={mapZoomState}
@@ -109,12 +109,10 @@ export const MapView = ({ zoom }) => {
                               key={Math.random()}
                             />
                           ))
-                          .reverse()
                       : ""}
                   </div>
                 );
               })
-              .reverse()
           : ""}
       </StyledPanZoom>
     </>
